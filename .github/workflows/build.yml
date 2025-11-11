@@ -149,6 +149,17 @@ jobs:
           sep-tags: " "
           sep-annotations: " "
 
+      - name: Free disk space (cleanup caches)
+        run: |
+            sudo apt-get clean -y || true
+            sudo rm -rf /var/lib/apt/lists/* /var/cache/apt/* || true
+            sudo rm -rf /var/tmp/* || true
+            sudo rm -rf $HOME/.cache/* || true
+            # remove old toolcache installs if they are huge (careful)
+            sudo du -sh /opt/hostedtoolcache || true
+            # show freed space
+            df -h /
+
       - name: Disk diagnostics (pre-build)
         run: |
             echo "Runner temp: $RUNNER_TEMP"
@@ -161,7 +172,6 @@ jobs:
             sudo du -sh /* 2>/dev/null | sort -hr | head -n 30
             sudo du -sh /var/* 2>/dev/null | sort -hr | head -n 30
             sudo du -sh $HOME/* 2>/dev/null | sort -hr | head -n 30
-
 
       - name: Build Image
         id: build_image
