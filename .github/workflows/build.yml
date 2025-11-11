@@ -150,17 +150,17 @@ jobs:
           sep-annotations: " "
 
       - name: Disk diagnostics (pre-build)
-            run: |
-                echo "Runner temp: $RUNNER_TEMP"
-                echo "Workspace: $GITHUB_WORKSPACE"
-                echo "===== df -h ====="
-                df -h /
-                df -h /tmp || true
-                df -i /
-                echo "===== du (top dirs) ====="
-                sudo du -sh /* 2>/dev/null | sort -hr | head -n 30
-                sudo du -sh /var/* 2>/dev/null | sort -hr | head -n 30
-                sudo du -sh $HOME/* 2>/dev/null | sort -hr | head -n 30
+        run: |
+            echo "Runner temp: $RUNNER_TEMP"
+            echo "Workspace: $GITHUB_WORKSPACE"
+            echo "===== df -h ====="
+            df -h /
+            df -h /tmp || true
+            df -i /
+            echo "===== du (top dirs) ====="
+            sudo du -sh /* 2>/dev/null | sort -hr | head -n 30
+            sudo du -sh /var/* 2>/dev/null | sort -hr | head -n 30
+            sudo du -sh $HOME/* 2>/dev/null | sort -hr | head -n 30
 
 
       - name: Build Image
