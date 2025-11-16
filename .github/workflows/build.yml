@@ -53,10 +53,10 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
       # # This is optional, but if you see that your builds are way too big for the runners, you can enable this by uncommenting the following lines:
-      # - name: Maximize build space
-      #   uses: ublue-os/remove-unwanted-software@cc0becac701cf642c8f0a6613bbdaf5dc36b259e # v9
-      #   with:
-      #     remove-codeql: true
+      - name: Maximize build space
+        uses: ublue-os/remove-unwanted-software@cc0becac701cf642c8f0a6613bbdaf5dc36b259e # v9
+        with:
+          remove-codeql: true
 
       - name: Mount BTRFS for podman storage
         uses: ublue-os/container-storage-action@main
@@ -149,41 +149,6 @@ jobs:
           sep-tags: " "
           sep-annotations: " "
 
-      - name: Maximize build disk space
-        uses: easimon/maximize-build-space@v10
-        with:
-          root-reserve-mb: 1024
-          remove-dotnet: 'true'
-          remove-android: 'true'
-          remove-haskell: 'true'
-          remove-codeql: 'true'
-          remove-docker-images: 'true'
-
-
-      - name: Free disk space (cleanup caches)
-        run: |
-            sudo apt-get clean -y || true
-            sudo rm -rf /var/lib/apt/lists/* /var/cache/apt/* || true
-            sudo rm -rf /var/tmp/* || true
-            sudo rm -rf $HOME/.cache/* || true
-            # remove old toolcache installs if they are huge (careful)
-            sudo du -sh /opt/hostedtoolcache || true
-            # show freed space
-            df -h /
-
-      - name: Disk diagnostics (pre-build)
-        run: |
-            echo "Runner temp: $RUNNER_TEMP"
-            echo "Workspace: $GITHUB_WORKSPACE"
-            echo "===== df -h ====="
-            df -h /
-            df -h /tmp || true
-            df -i /
-            echo "===== du (top dirs) ====="
-            sudo du -sh /* 2>/dev/null | sort -hr | head -n 30
-            sudo du -sh /var/* 2>/dev/null | sort -hr | head -n 30
-            sudo du -sh $HOME/* 2>/dev/null | sort -hr | head -n 30
-
       - name: Build Image
         id: build_image
         uses: redhat-actions/buildah-build@7a95fa7ee0f02d552a32753e7414641a04307056 # v2.13
@@ -194,7 +159,7 @@ jobs:
           # Syntax: https://docs.github.com/en/actions/learn-github-actions/expressions#format
           image: ${{ env.IMAGE_NAME }}
           tags: ${{ steps.metadata.outputs.tags }}
-          labels: '' # ${{ steps.metadata.outputs.labels }}
+          labels: ${{ steps.metadata.outputs.labels }}
           oci: false
           build-args: |
             BASE_IMAGE=ghcr.io/${{ env.SOURCE_ORG }}/${{ matrix.base_image }}:${{ env.IMAGE_SOURCE_TAG || 'latest' }}
